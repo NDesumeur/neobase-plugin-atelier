@@ -1,0 +1,9 @@
+{
+  "pluginId": "neobase.atelier",
+  "repo": "NDesumeur/neobase-plugin-atelier",
+  "version": "1.0.0",
+  "sha256": "c91527788ee624efa14146af4ccdb4f84049065260d0da117cab90215f9a39f1",
+  "approvedAt": "2026-11-01T11:55:24.493Z",
+  "neobase": ">=4.1.0",
+  "signature": "YPR14h/znh7gfwWXPcUOoIuzuUHUCoJOfLlQU5lktk5NZXXtpb/MVLWTlz8gj5WvewIFB8iAqk9J2sydKln/BA=="
+}
