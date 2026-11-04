@@ -1,9 +1,9 @@
 {
   "pluginId": "neodex.atelier",
   "repo": "NDesumeur/neodex-plugin-atelier",
-  "version": "1.0.0",
-  "sha256": "c91527788ee624efa14146af4ccdb4f84049065260d0da117cab90215f9a39f1",
-  "approvedAt": "2026-11-01T11:55:24.493Z",
+  "version": "1.1.0",
+  "sha256": "aa5f7be2511f4ac7cc881b2fc34b34aba0782f631d4d92297aa3ae1dc46b73cf",
+  "approvedAt": "2026-11-04T10:05:10.865Z",
   "neobase": ">=4.1.0",
-  "signature": "YPR14h/znh7gfwWXPcUOoIuzuUHUCoJOfLlQU5lktk5NZXXtpb/MVLWTlz8gj5WvewIFB8iAqk9J2sydKln/BA=="
+  "signature": "giG/yA62kJGjjmTGq47oKbbOjN0q8sfMJXy5PfBLQiBzeNbzQ1j74pVnBz9s5sILBlS9twOeOL1Q30S4AzreCA=="
 }
