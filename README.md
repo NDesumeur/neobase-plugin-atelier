@@ -1,6 +1,6 @@
 # Atelier
 
-L'IDE intégré de NeoBase, pour apprendre, bricoler et fabriquer des plugins sans quitter l'appli.
+L'IDE intégré de NeoDex, pour apprendre, bricoler et fabriquer des plugins sans quitter l'appli.
 
 - **Explorateur de projets** : plusieurs projets, fichiers et dossiers, onglets, renommer, supprimer.
 - **Éditeur** : coloration HTML / CSS / JavaScript / Python / JSON / Markdown, numéros de ligne, indentation automatique, parenthèses auto-fermées, chercher / remplacer, commenter, dupliquer et déplacer les lignes.
@@ -10,11 +10,11 @@ L'IDE intégré de NeoBase, pour apprendre, bricoler et fabriquer des plugins sa
 - **Python** : exécuté avec le Python 3 installé sur le PC, dans un dossier temporaire, 10 secondes au plus. Sans Python, un message l'explique.
 - **Plugins** : modèles prêts à l'emploi, test dans un cadre isolé (dossier de données en mémoire), validation de `plugin.json` et du code, export en `.zip` avec une icône générée si tu n'en as pas.
 
-Ton code ne tourne jamais dans NeoBase : il est toujours isolé et ne voit ni tes données ni tes onglets.
-La publication d'un plugin (Release GitHub, topic `neobase-plugin`, signature et approbation) reste faite hors de l'Atelier.
+Ton code ne tourne jamais dans NeoDex : il est toujours isolé et ne voit ni tes données ni tes onglets.
+La publication d'un plugin (Release GitHub, topic `neodex-plugin`, signature et approbation) reste faite hors de l'Atelier.
 
 ## Installer
 
-Dans NeoBase : **NeoStore → À découvrir → Atelier → Installer**. L'exécution de Python demande l'accès complet.
+Dans NeoDex : **NeoStore → À découvrir → Atelier → Installer**. L'exécution de Python demande l'accès complet.
 
-Développer un plugin : voir le [SDK NeoBase](https://github.com/NDesumeur/neobase-sdk).
+Développer un plugin : voir le [SDK NeoDex](https://github.com/NDesumeur/neodex-sdk).

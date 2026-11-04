@@ -1,9 +1,9 @@
 {
-  "id": "neobase.atelier",
+  "id": "neodex.atelier",
   "name": "Atelier",
   "version": "1.1.0",
   "author": "NDesumeur",
-  "description": "L'IDE de NeoBase : projets, éditeur coloré, aperçu web instantané, console, bac à sable JavaScript, Python, modèles et outils pour créer, tester et valider tes plugins.",
+  "description": "L'IDE de NeoDex : projets, éditeur coloré, aperçu web instantané, console, bac à sable JavaScript, Python, modèles et outils pour créer, tester et valider tes plugins.",
   "icon": "icon.png",
   "entry": "index.js",
   "view": "atelier",

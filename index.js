@@ -1,7 +1,7 @@
-// Atelier : l'IDE intégré de NeoBase. Explorateur de projets, éditeur avec coloration (HTML, CSS, JavaScript, Python, JSON, Markdown),
+// Atelier : l'IDE intégré de NeoDex. Explorateur de projets, éditeur avec coloration (HTML, CSS, JavaScript, Python, JSON, Markdown),
 // aperçu instantané des pages web, console, bac à sable JavaScript, exécution de Python (si Python est installé sur le PC),
-// modèles de projets, création / test / validation / export de plugins NeoBase.
-// Les projets sont dans le dossier du plugin (sauvegardé et synchronisé par NeoBase). Ton code ne tourne jamais dans NeoBase : toujours dans un cadre isolé.
+// modèles de projets, création / test / validation / export de plugins NeoDex.
+// Les projets sont dans le dossier du plugin (sauvegardé et synchronisé par NeoDex). Ton code ne tourne jamais dans NeoDex : toujours dans un cadre isolé.
 const CSS = `
 .ide{--bg:#0d0620;--bg2:#120a2c;--bg3:#1a1240;--line:#3a2a6e;--hi:#8a5cf0;--acc:#ff5ad9;--txt:#f3eaff;--sub:#9a88c4;--ok:#5be37d;--warn:#ffd07a;--err:#ff6b6b;display:flex;flex-direction:column;gap:8px;height:calc(100vh - 110px);min-height:520px;color:var(--txt);font-family:var(--text,'Pixelify Clair',monospace);font-size:14px}
 .ide *{box-sizing:border-box;scrollbar-width:thin;scrollbar-color:var(--line) var(--bg)}
@@ -122,9 +122,9 @@ const TEMPLATES = [
     'index.html': '<!doctype html>\n<html lang="fr">\n<head>\n  <meta charset="utf-8">\n  <title>Ma page</title>\n  <link rel="stylesheet" href="style.css">\n</head>\n<body>\n  <h1>Bonjour !</h1>\n  <p>Clique sur le bouton :</p>\n  <button id="b">Compter</button>\n  <p id="n">0</p>\n  <script src="app.js"></script>\n</body>\n</html>\n',
     'style.css': 'body {\n  font-family: system-ui, sans-serif;\n  background: #1b1238;\n  color: #f3eaff;\n  text-align: center;\n  padding: 40px;\n}\nbutton {\n  font-size: 20px;\n  padding: 10px 24px;\n  background: #ff5ad9;\n  border: 0;\n  cursor: pointer;\n}\n',
     'app.js': 'let n = 0;\ndocument.getElementById("b").onclick = () => {\n  n++;\n  document.getElementById("n").textContent = n;\n  console.log("clic n°" + n);\n};\n' } },
-  { id: 'js', name: 'Script JavaScript', d: 'Un script exécuté dans un bac à sable, avec la console.', files: { 'main.js': '// Exécuté dans un bac à sable : pas d\'accès à NeoBase ni à tes fichiers.\nconst carres = [1, 2, 3, 4, 5].map(n => n * n);\nconsole.log("Carrés :", carres);\n\nasync function attendre(ms) { return new Promise(r => setTimeout(r, ms)); }\nawait attendre(300);\nconsole.log("Terminé !");\n' } },
+  { id: 'js', name: 'Script JavaScript', d: 'Un script exécuté dans un bac à sable, avec la console.', files: { 'main.js': '// Exécuté dans un bac à sable : pas d\'accès à NeoDex ni à tes fichiers.\nconst carres = [1, 2, 3, 4, 5].map(n => n * n);\nconsole.log("Carrés :", carres);\n\nasync function attendre(ms) { return new Promise(r => setTimeout(r, ms)); }\nawait attendre(300);\nconsole.log("Terminé !");\n' } },
   { id: 'py', name: 'Script Python', d: 'Exécuté avec le Python installé sur ton PC.', files: { 'main.py': '# Nécessite Python 3 installé sur le PC.\nimport math\n\ndef cercle(r):\n    return math.pi * r ** 2\n\nfor r in (1, 2, 3):\n    print(f"rayon {r} -> aire {cercle(r):.2f}")\n' } },
-  { id: 'plug', name: 'Plugin : bonjour', d: 'Le plus petit plugin NeoBase, prêt à tester.', files: {
+  { id: 'plug', name: 'Plugin : bonjour', d: 'Le plus petit plugin NeoDex, prêt à tester.', files: {
     'plugin.json': PJ('moi.bonjour', 'Bonjour', { permissions: [] }),
     'index.js': "export default async function (ctx) {\n  const box = ctx.el('div', 'hello');\n  box.style.cssText = 'padding:24px;font-size:22px';\n  box.textContent = 'Bonjour depuis ' + ctx.id + ' !';\n  ctx.view.append(box);\n}\n",
     'README.md': '# Bonjour\n\nUn plugin d\'exemple.\n' } },
@@ -140,7 +140,7 @@ const TEMPLATES = [
 ];
 const KNOWN_PERMS = ['storage', 'files', 'network', 'clipboard', 'notifications', 'full'];
 const CATEGORIES = ['Jeux', 'Outils', 'Système', 'Bureautique', 'Communication', 'Voyage', 'Musique', 'Sport', 'Compagnon', 'Anime', 'Finance', 'NeoDle'];
-const ID_RE = /^[a-z0-9]+(\.[a-z0-9]+)+$/;   // la même règle que le chargeur de NeoBase
+const ID_RE = /^[a-z0-9]+(\.[a-z0-9]+)+$/;   // la même règle que le chargeur de NeoDex
 const SEMVER = /^\d+\.\d+\.\d+$/;
 function validatePlugin(files) {
   const out = [], add = (lvl, msg) => out.push({ lvl, msg });
@@ -159,7 +159,7 @@ function validatePlugin(files) {
   if (m.category && !CATEGORIES.includes(m.category)) add('w', 'category « ' + m.category + ' » : inconnue de NeoStore (' + CATEGORIES.slice(0, 5).join(', ') + '…).');
   const perms = Array.isArray(m.permissions) ? m.permissions : (add('e', 'permissions : une liste (peut être vide).'), []);
   for (const p of perms) if (!KNOWN_PERMS.includes(p)) add('e', 'permission inconnue : « ' + p + ' ».');
-  if (perms.includes('full')) add('w', '« full » (accès complet) : réservé aux plugins signés par NeoBase, demandé avec un avertissement.');
+  if (perms.includes('full')) add('w', '« full » (accès complet) : réservé aux plugins signés par NeoDex, demandé avec un avertissement.');
   if (m.dependencies && (typeof m.dependencies !== 'object' || Object.entries(m.dependencies).some(([k, v]) => !ID_RE.test(k) || typeof v !== 'string'))) add('e', 'dependencies : { "id.plugin": ">=1.0.0" }.');
   if (m.main && !(m.main in files)) add('e', 'main : le fichier « ' + m.main + ' » est absent.');
   if (!(m.icon in files) && !files['icon.png']) add('w', 'icône absente : l\'export en génère une automatiquement (remplace-la par la tienne : icon.png).');
@@ -372,11 +372,11 @@ export default async function (ctx) {
     for (const [k, v] of Object.entries(proj.files)) list.push({ name: k, data: enc.encode(v) });
     if (isPlugin && !proj.files['icon.png']) list.push({ name: 'icon.png', data: b64bytes(identicon(JSON.parse(proj.files['plugin.json']).id)) });
     const blob = zip(list), a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name + '.zip'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-    toast('Archive créée : ' + name + '.zip (' + list.length + ' fichiers)'); log('sys', isPlugin ? 'Archive prête : à joindre à une Release GitHub (topic neobase-plugin).' : 'Projet exporté en .zip');
+    toast('Archive créée : ' + name + '.zip (' + list.length + ' fichiers)'); log('sys', isPlugin ? 'Archive prête : à joindre à une Release GitHub (topic neodex-plugin).' : 'Projet exporté en .zip');
   };
   /* ----- toolbar ----- */
   const refreshButtons = () => { bar.innerHTML = ''; bar.append(projSel, mkB('Nouveau', showTemplates, '', 'Nouveau projet depuis un modèle'), mkB('Renommer', renameProject, 'sm'), mkB('Supprimer', delProject, 'sm'), mkB('▶ Exécuter', run, 'run', 'Ctrl + Entrée'), mkB('Enregistrer', () => { saveProj(true); toast('Enregistré'); }, '', 'Ctrl + S')); if (proj && proj.files['plugin.json']) bar.append(mkB('Valider le plugin', validate, '', 'Vérifie plugin.json et le code')); bar.append(mkB('Exporter .zip', exportZip, 'acc'), mkB('Aide', help, 'sm')); };
-  const help = () => modal((box, done) => { box.innerHTML = '<h3>Aide de l\'Atelier</h3><div style="line-height:1.55;font-size:13px">Ctrl+S enregistre · Ctrl+Entrée exécute · Ctrl+F cherche / remplace · Ctrl+/ commente · Ctrl+D duplique la ligne · Alt+↑/↓ déplace la ligne · Tab indente.<br><br><b>Pages web</b> : crée un projet « Page web » ; l\'aperçu se met à jour en tapant (le CSS et le JS liés sont pris dans le projet).<br><b>JavaScript</b> : « ▶ » exécute le fichier dans un bac à sable (8 s au plus, <code>await</code> permis).<br><b>Python</b> : demande Python 3 installé sur le PC ; le projet entier est écrit dans un dossier temporaire.<br><b>Plugins</b> : modèles « Plugin : … », ▶ teste le plugin dans un cadre isolé avec un dossier de données temporaire, « Valider » vérifie plugin.json, « Exporter .zip » fabrique l\'archive à joindre à une Release GitHub.<br><br>Ton code ne tourne jamais dans NeoBase : il est toujours isolé (<code>sandbox</code>) et ne voit ni tes données ni tes onglets.</div>'; const c = document.createElement('button'); c.className = 'ide-b acc'; c.textContent = 'Fermer'; c.onclick = () => done(1); box.append(c); });
+  const help = () => modal((box, done) => { box.innerHTML = '<h3>Aide de l\'Atelier</h3><div style="line-height:1.55;font-size:13px">Ctrl+S enregistre · Ctrl+Entrée exécute · Ctrl+F cherche / remplace · Ctrl+/ commente · Ctrl+D duplique la ligne · Alt+↑/↓ déplace la ligne · Tab indente.<br><br><b>Pages web</b> : crée un projet « Page web » ; l\'aperçu se met à jour en tapant (le CSS et le JS liés sont pris dans le projet).<br><b>JavaScript</b> : « ▶ » exécute le fichier dans un bac à sable (8 s au plus, <code>await</code> permis).<br><b>Python</b> : demande Python 3 installé sur le PC ; le projet entier est écrit dans un dossier temporaire.<br><b>Plugins</b> : modèles « Plugin : … », ▶ teste le plugin dans un cadre isolé avec un dossier de données temporaire, « Valider » vérifie plugin.json, « Exporter .zip » fabrique l\'archive à joindre à une Release GitHub.<br><br>Ton code ne tourne jamais dans NeoDex : il est toujours isolé (<code>sandbox</code>) et ne voit ni tes données ni tes onglets.</div>'; const c = document.createElement('button'); c.className = 'ide-b acc'; c.textContent = 'Fermer'; c.onclick = () => done(1); box.append(c); });
   /* ----- splitter ----- */
   let rw = meta.rw || 42; main.style.setProperty('--rw', rw + '%');
   const split = document.createElement('div'); split.className = 'ide-split'; split.style.cssText = 'position:absolute;width:8px;top:0;bottom:0;cursor:col-resize;z-index:5'; split.title = 'Glisse pour redimensionner';

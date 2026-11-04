@@ -1,4 +1,4 @@
-// Atelier (IDE) : le côté système du plugin, chargé par NeoBase une fois le plugin signé et l'accès complet accordé.
+// Atelier (IDE) : le côté système du plugin, chargé par NeoDex une fois le plugin signé et l'accès complet accordé.
 // Il ne sert qu'à exécuter du Python avec l'interpréteur installé sur le PC : le projet est écrit dans un dossier temporaire neuf,
 // le script tourne sans fenêtre, 10 secondes au plus, avec une sortie limitée, puis le dossier est supprimé.
 const { spawn, execFile } = require('child_process');
