@@ -10,6 +10,8 @@
   "neobase": ">=4.1.0",
   "type": "app",
   "category": "Outils",
+  "syncMode": "fusion",
+  "syncInfo": "Tes créations.",
   "mobile": false,
   "system": false,
   "dependencies": {},
