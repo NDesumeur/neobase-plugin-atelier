@@ -24,9 +24,9 @@ const CSS = `
 .ide-t{display:flex;align-items:center;gap:6px;padding:6px 10px;border:0;background:none;white-space:nowrap;font-size:13px;color:var(--sub);border-bottom:3px solid transparent}
 .ide-t.on{color:#fff;background:var(--bg2);border-bottom-color:var(--acc)}.ide-t b{font-weight:800;color:var(--warn)}
 .ide-ed{position:relative;flex:1;min-height:0;display:flex;background:#0b0520}
-.ide-gut{flex:none;width:44px;overflow:hidden;padding:8px 6px 8px 0;text-align:right;color:#5e4d85;font:13px/19px Consolas,'Courier New',monospace;user-select:none;background:#0d0626;white-space:pre}
+.ide-gut{flex:none;width:44px;overflow:hidden;padding:8px 6px 8px 0;text-align:right;color:#5e4d85;font:var(--fs,13px)/var(--lh,19px) Consolas,'Courier New',monospace;user-select:none;background:#0d0626;white-space:pre}
 .ide-code{position:relative;flex:1;min-width:0}
-.ide-code pre,.ide-code textarea{position:absolute;inset:0;margin:0;padding:8px 10px;font:13px/19px Consolas,'Courier New',monospace;white-space:pre;overflow:auto;tab-size:2;border:0;outline:0;letter-spacing:0}
+.ide-code pre,.ide-code textarea{position:absolute;inset:0;margin:0;padding:8px 10px;font:var(--fs,13px)/var(--lh,19px) Consolas,'Courier New',monospace;white-space:pre;overflow:auto;tab-size:2;border:0;outline:0;letter-spacing:0}
 .ide-code pre{pointer-events:none;color:#e8def8;background:none}
 .ide-code textarea{color:transparent;caret-color:#fff;background:transparent;resize:none;-webkit-text-fill-color:transparent}
 .ide-code textarea::selection{background:rgba(138,92,240,.45);-webkit-text-fill-color:transparent}
@@ -46,6 +46,15 @@ const CSS = `
 .ide-tpl{border:0;background:var(--bg3);padding:10px;text-align:left;box-shadow:0 0 0 2px var(--line);display:flex;flex-direction:column;gap:4px}.ide-tpl:hover{box-shadow:0 0 0 2px var(--hi)}.ide-tpl b{color:#fff}.ide-tpl span{color:var(--sub);font-size:12px;line-height:1.35}
 .ide-split{cursor:col-resize}
 @media (max-width:1100px){.ide-main{grid-template-columns:170px minmax(0,1fr)}.ide-right{grid-column:1/-1;height:360px}}
+.ide-status{flex:none;display:flex;gap:10px;padding:4px 10px;background:var(--bg3);font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;box-shadow:inset 0 2px 0 var(--line)}
+.ide-cur{position:absolute;left:0;right:0;background:rgba(138,92,240,.12);box-shadow:inset 3px 0 0 var(--acc);pointer-events:none}
+.ide-pal{display:flex;flex-direction:column;max-height:50vh;overflow-y:auto;box-shadow:inset 0 0 0 2px var(--line)}
+.ide-pi{border:0;background:none;text-align:left;padding:6px 10px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ide-pi:hover,.ide-pi.on{background:var(--hi);color:#fff} .ide-pi em{font-style:normal;color:var(--sub);margin-right:8px}
+.ide-pane.drop{box-shadow:0 0 0 2px var(--acc),0 3px 0 2px #05010b}
+.ide-bar{background:repeating-linear-gradient(90deg,var(--bg3) 0 8px,#1e1548 8px 10px)}
+.ide-ph::before{content:'';width:6px;height:6px;background:var(--acc);box-shadow:2px 2px 0 #8a1a7a;flex:none}
+.ide-logo{font:10px var(--title,monospace);color:#fff;text-shadow:2px 2px 0 var(--acc);padding:0 8px 0 2px;letter-spacing:1px}
 `;
 const EXT_COL = { html: '#ff8a5c', css: '#5cb8ff', js: '#ffd45c', json: '#5be37d', py: '#8be9fd', md: '#c070ff', txt: '#9a88c4', png: '#ff5ad9' };
 const extOf = p => (p.split('.').pop() || '').toLowerCase();
@@ -136,9 +145,17 @@ const TEMPLATES = [
     'plugin.json': PJ('moi.rebond', 'Rebond', { category: 'Jeux', permissions: ['storage'] }),
     'index.js': "export default async function (ctx) {\n  const cv = document.createElement('canvas'); cv.width = 480; cv.height = 300; cv.style.cssText = 'image-rendering:pixelated;background:#0a0418;box-shadow:0 0 0 3px #3a2a6e';\n  ctx.view.append(cv); const g = cv.getContext('2d');\n  const ball = { x: 240, y: 150, vx: 140, vy: 90 }; let last = performance.now(), raf = 0, score = 0;\n  cv.onclick = () => { ball.vx *= -1.05; score++; };\n  const frame = t => {\n    const dt = Math.min(.05, (t - last) / 1000); last = t;\n    ball.x += ball.vx * dt; ball.y += ball.vy * dt;\n    if (ball.x < 8 || ball.x > 472) ball.vx *= -1; if (ball.y < 8 || ball.y > 292) ball.vy *= -1;\n    g.fillStyle = '#0a0418'; g.fillRect(0, 0, 480, 300); g.fillStyle = '#ff5ad9'; g.fillRect(ball.x - 8, ball.y - 8, 16, 16);\n    g.fillStyle = '#fff'; g.font = '14px monospace'; g.fillText('Clics : ' + score, 10, 20);\n    raf = requestAnimationFrame(frame);\n  };\n  raf = requestAnimationFrame(frame);\n  ctx.onClose(() => cancelAnimationFrame(raf));\n}\n",
     'README.md': '# Rebond\n\nUne balle qui rebondit. Clique dessus pour la relancer.\n' } },
+  { id: 'plug4', name: 'Plugin : widget d\'accueil', d: 'Une carte sur l\'accueil de NeoDex, mise à jour toutes les 15 min.', files: {
+    'plugin.json': PJ('moi.widget', 'Mon widget', { permissions: ['storage', 'background'], widget: true }),
+    'index.js': "export default async function (ctx) {\n  // la carte sur l'accueil : un titre et quelques lignes\n  const maj = () => ctx.widget.set({ title: 'Mon widget', lines: ['Il est ' + new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }), 'Modifie index.js pour afficher autre chose'] });\n  maj();\n  ctx.background.every(15, maj);\n  const box = ctx.el('div'); box.style.cssText = 'padding:24px'; box.textContent = 'Regarde l\\'accueil : ta carte y est.';\n  ctx.view.replaceChildren(box);\n}\n",
+    'README.md': '# Mon widget\n\nUne carte sur l\'accueil (`ctx.widget`), mise à jour en arrière-plan (`ctx.background`).\n' } },
+  { id: 'plug5', name: 'Plugin : notifications', d: 'Envoie des notifications avec une image ; leurs types sont décrits dans plugin.json.', files: {
+    'plugin.json': PJ('moi.rappel', 'Rappel', { permissions: ['storage', 'notifications'], notifications: [{ type: 'rappel', name: 'Rappel', description: 'Le rappel que tu programmes dans le plugin.' }] }),
+    'index.js': "export default async function (ctx) {\n  const b = ctx.el('button', 'btn main px', 'M\\'ENVOYER UNE NOTIFICATION');\n  b.onclick = () => ctx.notifications.send({ type: 'rappel', title: 'Coucou !', body: 'Une notification de test, avec son type.', open: 'plugin:' + ctx.id });\n  const box = ctx.el('div'); box.style.cssText = 'padding:24px'; box.append(b);\n  ctx.view.replaceChildren(box);\n}\n",
+    'README.md': '# Rappel\n\nEnvoie une notification (`ctx.notifications.send`). Ses types sont décrits dans `plugin.json` (`notifications`) : on peut les couper dans l\'appli Notifications.\n' } },
   { id: 'vide', name: 'Projet vide', d: 'Un seul fichier texte.', files: { 'notes.md': '# Notes\n\n' } },
 ];
-const KNOWN_PERMS = ['storage', 'files', 'network', 'clipboard', 'notifications', 'full'];
+const KNOWN_PERMS = ['storage', 'files', 'network', 'clipboard', 'notifications', 'background', 'agenda', 'full'];
 const CATEGORIES = ['Jeux', 'Outils', 'Système', 'Bureautique', 'Communication', 'Voyage', 'Musique', 'Sport', 'Compagnon', 'Anime', 'Finance', 'NeoDle'];
 const ID_RE = /^[a-z0-9]+(\.[a-z0-9]+)+$/;   // la même règle que le chargeur de NeoDex
 const SEMVER = /^\d+\.\d+\.\d+$/;
@@ -158,7 +175,8 @@ function validatePlugin(files) {
   if (typeof m.neobase !== 'string' || !/^[<>=^~\d.\sx*|-]+$/.test(m.neobase)) add('e', 'neobase : une plage de versions comme >=4.1.0.');
   if (m.category && !CATEGORIES.includes(m.category)) add('w', 'category « ' + m.category + ' » : inconnue de NeoStore (' + CATEGORIES.slice(0, 5).join(', ') + '…).');
   const perms = Array.isArray(m.permissions) ? m.permissions : (add('e', 'permissions : une liste (peut être vide).'), []);
-  for (const p of perms) if (!KNOWN_PERMS.includes(p)) add('e', 'permission inconnue : « ' + p + ' ».');
+  for (const p of perms) if (!KNOWN_PERMS.includes(p) && !/^network:[\w.-]+$/.test(p)) add('e', 'permission inconnue : « ' + p + ' ».');
+  if (m.notifications != null) { if (!Array.isArray(m.notifications)) add('e', 'notifications : une liste de { type, name, description }.'); else for (const t of m.notifications) if (!/^[a-z0-9-]{1,40}$/.test(t?.type || '')) add('e', 'notifications : chaque type a un « type » en minuscules (lettres, chiffres, tirets).'); if (!perms.includes('notifications')) add('w', 'des types de notification sans la permission « notifications ».'); }
   if (perms.includes('full')) add('w', '« full » (accès complet) : réservé aux plugins signés par NeoDex, demandé avec un avertissement.');
   if (m.dependencies && (typeof m.dependencies !== 'object' || Object.entries(m.dependencies).some(([k, v]) => !ID_RE.test(k) || typeof v !== 'string'))) add('e', 'dependencies : { "id.plugin": ">=1.0.0" }.');
   if (m.main && !(m.main in files)) add('e', 'main : le fichier « ' + m.main + ' » est absent.');
@@ -192,7 +210,7 @@ const files=${JSON.stringify(files).replace(/</g, '\\u003c')};const m=JSON.parse
 const opens=[],closes=[];const toast=(msg,err)=>console[err?'error':'log']('[toast] '+msg);
 const perms=m.permissions||[];
 const folder={read:async n=>mem[n]??null,write:async(n,d)=>{mem[n]=JSON.parse(JSON.stringify(d))},remove:async n=>{delete mem[n]},list:async()=>Object.keys(mem)};
-const ctx={id:m.id||${JSON.stringify(id)},version:m.version||'0.0.0',view:document.getElementById('v'),el,ui:{toast,newTab:u=>console.log('[newTab] '+u),pixIcon:()=>''},onOpen:f=>opens.push(f),onClose:f=>closes.push(f),permission:async()=>true,legacy:{}};
+const ctx={id:m.id||${JSON.stringify(id)},version:m.version||'0.0.0',view:document.getElementById('v'),el,ui:{toast,newTab:u=>console.log('[newTab] '+u),pixIcon:()=>''},onOpen:f=>opens.push(f),onClose:f=>closes.push(f),permission:async()=>true,legacy:{},widget:{set:d=>console.log('[widget accueil] '+JSON.stringify(d)),clear:()=>console.log('[widget accueil] vidé')},background:{every:(n,f)=>console.log('[arrière-plan] toutes les '+n+' min')},notifications:{send:async n=>{console.log('[notification] '+(n&&n.title)+(n&&n.body?' · '+n.body:''));return 'test'}}};
 if(perms.includes('storage')||perms.includes('full')){ctx.folder=folder;ctx.storage={get:()=>mem.storage||{},set:d=>{mem.storage=d}}}
 ctx.host={el,toast,sfx(){},ask:async()=>'',newTab(){},pixIcon:()=>'',confirm:async()=>true,box:async()=>0,addStyle(c){const s=document.createElement('style');s.textContent=c;document.head.append(s)},hooks(){},settings:()=>({}),pref:()=>null,tabLabel(){},menuItem(){},closeTab(){},statCount(){}};
 try{const url=URL.createObjectURL(new Blob([files[m.entry||'index.js']||''],{type:'text/javascript'}));const mod=await import(url);await mod.default(ctx);opens.forEach(f=>f());console.log('Plugin chargé : '+ctx.id+' '+ctx.version+(perms.length?' · permissions : '+perms.join(', '):''))}catch(e){console.error('Le plugin plante au chargement : '+(e.stack||e))}
@@ -241,7 +259,7 @@ export default async function (ctx) {
   /* ----- editor ----- */
   const file = () => proj && proj.files[active];
   const refreshEd = () => { const t = ta.value, lang = langOf(active || ''); pre.innerHTML = highlight(lang, t) + '\n'; const n = t.split('\n').length; if (gut._n !== n) { gut._n = n; gut.textContent = Array.from({ length: n }, (_, i) => i + 1).join('\n'); } };
-  const loadFile = () => { const t = proj && proj.files[active]; ta.disabled = t == null; ta.value = t ?? ''; ta.placeholder = t == null ? 'Ouvre ou crée un fichier' : ''; refreshEd(); ta.scrollTop = ta.scrollLeft = 0; syncScroll(); };
+  const loadFile = () => { const t = proj && proj.files[active]; ta.disabled = t == null; ta.value = t ?? ''; ta.placeholder = t == null ? 'Ouvre ou crée un fichier' : ''; refreshEd(); ta.scrollTop = ta.scrollLeft = 0; syncScroll(); typeof updStatus === 'function' && updStatus(); };
   const syncScroll = () => { pre.scrollTop = ta.scrollTop; pre.scrollLeft = ta.scrollLeft; gut.scrollTop = ta.scrollTop; };
   ta.addEventListener('scroll', syncScroll);
   const onEdit = () => { if (!proj || active == null) return; proj.files[active] = ta.value; dirty.add(active); refreshEd(); renderTabs(); saveProj(false); clearTimeout(prevT); prevT = setTimeout(() => livePreview(), 450); };
@@ -375,8 +393,76 @@ export default async function (ctx) {
     toast('Archive créée : ' + name + '.zip (' + list.length + ' fichiers)'); log('sys', isPlugin ? 'Archive prête : à joindre à une Release GitHub (topic neodex-plugin).' : 'Projet exporté en .zip');
   };
   /* ----- toolbar ----- */
-  const refreshButtons = () => { bar.innerHTML = ''; bar.append(projSel, mkB('Nouveau', showTemplates, '', 'Nouveau projet depuis un modèle'), mkB('Renommer', renameProject, 'sm'), mkB('Supprimer', delProject, 'sm'), mkB('▶ Exécuter', run, 'run', 'Ctrl + Entrée'), mkB('Enregistrer', () => { saveProj(true); toast('Enregistré'); }, '', 'Ctrl + S')); if (proj && proj.files['plugin.json']) bar.append(mkB('Valider le plugin', validate, '', 'Vérifie plugin.json et le code')); bar.append(mkB('Exporter .zip', exportZip, 'acc'), mkB('Aide', help, 'sm')); };
-  const help = () => modal((box, done) => { box.innerHTML = '<h3>Aide de l\'Atelier</h3><div style="line-height:1.55;font-size:13px">Ctrl+S enregistre · Ctrl+Entrée exécute · Ctrl+F cherche / remplace · Ctrl+/ commente · Ctrl+D duplique la ligne · Alt+↑/↓ déplace la ligne · Tab indente.<br><br><b>Pages web</b> : crée un projet « Page web » ; l\'aperçu se met à jour en tapant (le CSS et le JS liés sont pris dans le projet).<br><b>JavaScript</b> : « ▶ » exécute le fichier dans un bac à sable (8 s au plus, <code>await</code> permis).<br><b>Python</b> : demande Python 3 installé sur le PC ; le projet entier est écrit dans un dossier temporaire.<br><b>Plugins</b> : modèles « Plugin : … », ▶ teste le plugin dans un cadre isolé avec un dossier de données temporaire, « Valider » vérifie plugin.json, « Exporter .zip » fabrique l\'archive à joindre à une Release GitHub.<br><br>Ton code ne tourne jamais dans NeoDex : il est toujours isolé (<code>sandbox</code>) et ne voit ni tes données ni tes onglets.</div>'; const c = document.createElement('button'); c.className = 'ide-b acc'; c.textContent = 'Fermer'; c.onclick = () => done(1); box.append(c); });
+  const refreshButtons = () => { bar.innerHTML = ''; bar.append(projSel, mkB('Nouveau', showTemplates, '', 'Nouveau projet depuis un modèle'), mkB('Renommer', renameProject, 'sm'), mkB('Supprimer', delProject, 'sm'), mkB('▶ Exécuter', run, 'run', 'Ctrl + Entrée'), mkB('Enregistrer', () => { saveProj(true); toast('Enregistré'); }, '', 'Ctrl + S')); if (proj && proj.files['plugin.json']) bar.append(mkB('Valider le plugin', validate, '', 'Vérifie plugin.json et le code')); bar.append(mkB('Exporter .zip', exportZip, 'acc'), mkB('Chercher', searchAll, 'sm', 'Chercher dans tout le projet (Ctrl+Maj+F)'), mkB('Importer', importFiles, 'sm', 'Ajouter des fichiers au projet (ou glisse-les sur la liste des fichiers)'), mkB('Commandes', palette, 'sm', 'Ctrl+P'), mkB('Aide', help, 'sm')); bar.prepend(Object.assign(document.createElement('span'), { className: 'ide-logo', textContent: 'ATELIER' })); };
+  const help = () => modal((box, done) => { box.innerHTML = '<h3>Aide de l\'Atelier</h3><div style="line-height:1.55;font-size:13px">Ctrl+P : fichiers et commandes · Ctrl+Maj+F : chercher dans tout le projet · Maj+Alt+F : formater · Ctrl+= / Ctrl+- : taille du texte<br>Ctrl+S enregistre · Ctrl+Entrée exécute · Ctrl+F cherche / remplace · Ctrl+/ commente · Ctrl+D duplique la ligne · Alt+↑/↓ déplace la ligne · Tab indente.<br><br><b>Pages web</b> : crée un projet « Page web » ; l\'aperçu se met à jour en tapant (le CSS et le JS liés sont pris dans le projet).<br><b>JavaScript</b> : « ▶ » exécute le fichier dans un bac à sable (8 s au plus, <code>await</code> permis).<br><b>Python</b> : demande Python 3 installé sur le PC ; le projet entier est écrit dans un dossier temporaire.<br><b>Plugins</b> : modèles « Plugin : … », ▶ teste le plugin dans un cadre isolé avec un dossier de données temporaire, « Valider » vérifie plugin.json, « Exporter .zip » fabrique l\'archive à joindre à une Release GitHub.<br><br>Ton code ne tourne jamais dans NeoDex : il est toujours isolé (<code>sandbox</code>) et ne voit ni tes données ni tes onglets.</div>'; const c = document.createElement('button'); c.className = 'ide-b acc'; c.textContent = 'Fermer'; c.onclick = () => done(1); box.append(c); });
+  /* ----- barre d'état, ligne courante, palette de commandes, recherche dans le projet, formatage, import, zoom ----- */
+  const status = document.createElement('div'); status.className = 'ide-status'; pEd.append(status);
+  const curLine = document.createElement('div'); curLine.className = 'ide-cur'; codeBox.prepend(curLine);
+  const LANG_NAME = { html: 'HTML', css: 'CSS', js: 'JavaScript', json: 'JSON', py: 'Python', md: 'Markdown', txt: 'Texte' };
+  const LH = () => Math.round((meta.fs || 13) * 19 / 13);
+  const updStatus = () => {
+    const v = ta.value, s = ta.selectionStart, line = v.slice(0, s).split('\n').length, col = s - v.lastIndexOf('\n', s - 1), selN = Math.abs(ta.selectionEnd - s);
+    curLine.style.top = (8 + (line - 1) * LH() - ta.scrollTop) + 'px'; curLine.style.height = LH() + 'px'; curLine.hidden = !active || ta.disabled;
+    status.textContent = active ? `Ligne ${line}, col ${col}${selN ? ' · ' + selN + ' car. sélectionné' + (selN > 1 ? 's' : '') : ''} · ${LANG_NAME[langOf(active)]} · ${v.split('\n').length} lignes · ${(new Blob([v]).size / 1024).toFixed(1)} Ko · ${dirty.has(active) ? 'modifié' : 'enregistré'} · Ctrl+P : commandes` : 'Aucun fichier ouvert · Ctrl+P : commandes';
+  };
+  ['input', 'keyup', 'click', 'select', 'scroll', 'focus'].forEach(ev => ta.addEventListener(ev, updStatus));
+  const goLine = (p, n) => {
+    selectFile(p); const v = ta.value; let pos = 0; for (let k = 0; k < n && pos >= 0; k++) pos = v.indexOf('\n', pos) + 1;
+    const end = v.indexOf('\n', pos); ta.focus(); ta.setSelectionRange(pos, end < 0 ? v.length : end); ta.scrollTop = Math.max(0, (n - 6) * LH()); syncScroll(); updStatus();
+  };
+  const listBox = (box, input, rows, done) => {  // une liste qu'on parcourt au clavier (↑ ↓ Entrée), pour la palette et la recherche
+    let sel = 0, hits = []; const list = document.createElement('div'); list.className = 'ide-pal';
+    const draw = () => { hits = rows(input.value); sel = Math.min(sel, Math.max(0, hits.length - 1));
+      list.replaceChildren(...(hits.length ? hits.map(([tag, label, f], k) => { const b = document.createElement('button'); b.className = 'ide-pi' + (k === sel ? ' on' : ''); const em = document.createElement('em'); em.textContent = tag; b.append(em, label); b.onclick = () => { done(1); f(); }; return b; })
+        : [Object.assign(document.createElement('div'), { className: 'ide-pi', textContent: input.value ? 'Aucun résultat' : '' })]));
+      list.querySelector('.on')?.scrollIntoView({ block: 'nearest' }); };
+    input.oninput = () => { sel = 0; draw(); };
+    input.onkeydown = e => { if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); sel = Math.max(0, Math.min(hits.length - 1, sel + (e.key === 'ArrowDown' ? 1 : -1))); draw(); }
+      else if (e.key === 'Enter' && hits[sel]) { done(1); hits[sel][2](); } else if (e.key === 'Escape') done(null); };
+    box.append(input, list); draw(); setTimeout(() => input.focus(), 20);
+  };
+  const inputOf = ph => Object.assign(document.createElement('input'), { className: 'ide-in', placeholder: ph, spellcheck: false });
+  const format = () => {
+    if (!active) return; const lang = langOf(active); let v = ta.value;
+    try { v = lang === 'json' ? JSON.stringify(JSON.parse(v), null, 2) + '\n' : v.replace(/[ \t]+$/gm, '').replace(/\t/g, '  ').replace(/\n{3,}/g, '\n\n').replace(/\s*$/, '\n'); }
+    catch (e) { toast('JSON invalide : ' + e.message, true); return; }
+    if (v === ta.value) return toast('Déjà propre');
+    ta.focus(); ta.select(); ins(v); toast(lang === 'json' ? 'JSON remis en forme' : 'Espaces en trop retirés');
+  };
+  const addFiles = async list => {
+    if (!proj) return; let n = 0;
+    for (const f of list) {
+      if (f.size > 1.5e6) { toast(f.name + ' : trop gros (1,5 Mo au plus)', true); continue; }
+      const p = f.name.replace(/[^\w.\- ]/g, '_');
+      proj.files[p] = /^image\//.test(f.type) ? await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(f); }) : await f.text(); n++;
+    }
+    if (n) { saveProj(true); renderTree(); toast(n + ' fichier' + (n > 1 ? 's importés' : ' importé')); }
+  };
+  const importFiles = () => { const i = document.createElement('input'); i.type = 'file'; i.multiple = true; i.onchange = () => addFiles([...i.files]); i.click(); };
+  pExp.addEventListener('dragover', e => { e.preventDefault(); pExp.classList.add('drop'); });
+  pExp.addEventListener('dragleave', () => pExp.classList.remove('drop'));
+  pExp.addEventListener('drop', e => { e.preventDefault(); pExp.classList.remove('drop'); addFiles([...e.dataTransfer.files]); });
+  const zoom = d => { meta.fs = Math.max(10, Math.min(22, (meta.fs || 13) + d)); root.style.setProperty('--fs', meta.fs + 'px'); root.style.setProperty('--lh', LH() + 'px'); saveMeta(); refreshEd(); syncScroll(); updStatus(); };
+  const searchAll = () => modal((box, done) => {
+    box.innerHTML = '<h3>Chercher dans tout le projet</h3>';
+    listBox(box, inputOf('Texte à chercher (2 caractères au moins)'), q => {
+      if (q.length < 2) return []; const out = [], ql = q.toLowerCase();
+      for (const [p, t] of Object.entries(proj?.files || {})) { if (typeof t !== 'string' || t.startsWith('data:')) continue; t.split('\n').forEach((l, n) => { if (out.length < 200 && l.toLowerCase().includes(ql)) out.push([p + ':' + (n + 1), l.trim().slice(0, 120), () => goLine(p, n)]); }); }
+      return out;
+    }, done);
+  });
+  const palette = () => modal((box, done) => {
+    box.innerHTML = '<h3>Aller à un fichier ou lancer une commande</h3>';
+    const cmds = [['Exécuter', run], ['Enregistrer', () => { saveProj(true); toast('Enregistré'); }], ['Nouveau fichier', newFile], ['Nouveau projet', showTemplates], ['Formater le fichier', format],
+      ['Chercher dans le projet', searchAll], ['Importer des fichiers', importFiles], ['Valider le plugin', validate], ['Exporter .zip', exportZip], ['Agrandir le texte', () => zoom(1)], ['Réduire le texte', () => zoom(-1)], ['Aide', help]];
+    listBox(box, inputOf('Nom de fichier ou commande'), q => { const ql = q.trim().toLowerCase();
+      return [...Object.keys(proj?.files || {}).filter(p => p.toLowerCase().includes(ql)).map(p => ['fichier', p, () => selectFile(p)]), ...cmds.filter(([n]) => n.toLowerCase().includes(ql)).map(([n, f]) => ['commande', n, f])].slice(0, 40); }, done);
+  });
+  root.addEventListener('keydown', e => {  // en capture : avant les raccourcis de l'éditeur
+    const mod = e.ctrlKey || e.metaKey, k = e.key.toLowerCase(), act = mod && k === 'p' ? palette : mod && e.shiftKey && k === 'f' ? searchAll : e.altKey && e.shiftKey && k === 'f' ? format : mod && (k === '=' || k === '+') ? () => zoom(1) : mod && k === '-' ? () => zoom(-1) : null;
+    if (act) { e.preventDefault(); e.stopPropagation(); act(); }
+  }, true);
+  if (meta.fs) zoom(0);
   /* ----- splitter ----- */
   let rw = meta.rw || 42; main.style.setProperty('--rw', rw + '%');
   const split = document.createElement('div'); split.className = 'ide-split'; split.style.cssText = 'position:absolute;width:8px;top:0;bottom:0;cursor:col-resize;z-index:5'; split.title = 'Glisse pour redimensionner';
